@@ -16,9 +16,12 @@ class Spider():
     vip_url = 'https://cdn.yangju.vip/k/?url='
     # 搜狐视频搜索网址
     source_url = "https://so.tv.sohu.com/mts?wd="
-    root_pattern = r'<div class="series cfix">[\w\W]*?</div>'
+    # root_pattern = r'<div class="series cfix">[\w\W]*?</div>'
+    root_pattern = r'<div class="siteSeries cfix">[\w\W]*?</div>'
     goal_name_pattern = r'title="([\w\W]*?)">'
+    goal_name_pattern2 = r'data-title="([\w\W]*?)" data-vinfo'
     goal_url_pattern = r'<a class="" href="//([\w\W]*?)" target'
+    goal_url_pattern2 = r'data-url="//([\w\W]*?)" pb-url'
 
     def __input_video(self):
         wd = input('请输入视频名字：')
@@ -39,17 +42,30 @@ class Spider():
 
     def __analysis(self, html):
         root_html = re.findall(Spider.root_pattern, html)
+        # root_html2 = re.findall(Spider.root_pattern2, html)
         root_html = str(root_html)
-        video_lists = []
+        # root_html2 = str(root_html2)
         goal_names = re.findall(Spider.goal_name_pattern, root_html)
         goal_urls = re.findall(Spider.goal_url_pattern, root_html)
-        for i in range(0, len(goal_names)):
-            dic = dict()
-            dic['name'] = goal_names[i]
-            dic['url'] = 'https://' + goal_urls[i]
-            if '预告' not in goal_names[i]:
-                if len(goal_names[i]) > 2:
-                    video_lists.append(dic)
+        if goal_names == [] or goal_urls == []:
+            goal_names = re.findall(Spider.goal_name_pattern2, root_html)
+            goal_urls = re.findall(Spider.goal_url_pattern2, root_html)
+        video_lists = []
+
+        if len(goal_urls) > 0:
+            if len(goal_urls) <= len(goal_names):
+                range_num = len(goal_urls)
+            else:
+                range_num = len(goal_names)
+            for i in range(0, range_num):
+                dic = dict()
+                dic['name'] = goal_names[i]
+                dic['url'] = 'https://' + goal_urls[i]
+                if '预告' not in goal_names[i]:
+                    if len(goal_names[i]) > 2:
+                        video_lists.append(dic)
+        else:
+            print("出错")
         return video_lists
 
     def __refine(self, lists):
