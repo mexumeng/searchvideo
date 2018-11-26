@@ -18,9 +18,9 @@ class Spider():
     source_url = "https://so.tv.sohu.com/mts?wd="
     # root_pattern = r'<div class="series cfix">[\w\W]*?</div>'
     root_pattern = r'<div class="siteSeries cfix">[\w\W]*?</div>'
-    goal_name_pattern = r'title="([\w\W]*?)">'
+    goal_name_pattern = r'title="([\w\W]*?)"'
     goal_name_pattern2 = r'data-title="([\w\W]*?)" data-vinfo'
-    goal_url_pattern = r'<a class="" href="//([\w\W]*?)" target'
+    goal_url_pattern = r'href="//([\w\W]*?)"'
     goal_url_pattern2 = r'data-url="//([\w\W]*?)" pb-url'
 
     def __input_video(self):
@@ -49,9 +49,9 @@ class Spider():
         # root_html2 = str(root_html2)
         goal_names = re.findall(Spider.goal_name_pattern, root_html)
         goal_urls = re.findall(Spider.goal_url_pattern, root_html)
-        if goal_names == [] or goal_urls == []:
-            goal_names = re.findall(Spider.goal_name_pattern2, root_html)
-            goal_urls = re.findall(Spider.goal_url_pattern2, root_html)
+        # if '立即播放' in goal_names:
+        #     goal_names = re.findall(Spider.goal_name_pattern2, root_html)
+        #     goal_urls = re.findall(Spider.goal_url_pattern2, root_html)
         video_lists = []
 
         if len(goal_urls) > 0:
