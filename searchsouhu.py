@@ -2,8 +2,8 @@ __author__ = "xumeng"
 __date__ = "2018/11/19 15:00"
 from urllib import parse
 import re
-from selenium import webdriver
-
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.options import Options
 '''
 视频搜索-搜狐视频免费观看网址
 
@@ -33,11 +33,13 @@ class Spider():
         '''
         获取网页信息，返回字符串型网页内容
         '''
-        driver = webdriver.Firefox()
-        driver.maximize_window()
+        options = Options()
+        options.add_argument('-headless')  # 无头参数
+        driver = Firefox(executable_path='geckodriver', firefox_options=options)  # 配了环境变量第一个参数就可以省了，不然传绝对路径
         driver.get(url)
         html = driver.page_source
         html = parse.unquote(html)
+        driver.quit()
         return html
 
     def __analysis(self, html):
