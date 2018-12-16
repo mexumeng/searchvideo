@@ -2,10 +2,12 @@ __author__ = "xumeng"
 __date__ = "2018/11/19 15:00"
 from urllib import parse
 import re
+import time
+import datetime
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 '''
-视频搜索-搜狐视频免费观看网址
+视频搜索-vip视频免费观看网址
 
 '''
 
@@ -13,7 +15,7 @@ from selenium.webdriver.firefox.options import Options
 class Spider():
 
     # 解析vip视频的url
-    vip_url = 'https://cdn.yangju.vip/k/?url='
+    vip_url = 'https://yangju.vip/vip/?url='
     # 搜狐视频搜索网址
     source_url = "https://so.tv.sohu.com/mts?wd="
     # root_pattern = r'<div class="series cfix">[\w\W]*?</div>'
@@ -79,13 +81,22 @@ class Spider():
         for lis in lists:
             print(lis['name'] + '\t' + lis['url'])
 
+    def __save_video_lists(self, lists):
+        with open('./{name}电影列表.txt'.format(name=datetime.datetime.now().strftime('%Y%m%d%H%M%S')), 'w', encoding='utf-8') as f:
+            for l in lists:
+                f.writelines(str(l)+'\n')
+            f.close()
+
     def go(self):
         url = self.__input_video()
         html = self.__get_content(url)
         html = self.__analysis(html)
         video_lists = self.__refine(html)
         self.__my_print(video_lists)
+        self.__save_video_lists(video_lists)
 
 
-spider = Spider()
-spider.go()
+if __name__ == "__main__":
+    spider = Spider()
+    spider.go()
+
