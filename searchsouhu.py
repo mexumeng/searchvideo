@@ -25,6 +25,7 @@ class Spider():
     goal_url_pattern = r'href="//([\w\W]*?)"'
     goal_url_pattern2 = r'data-url="//([\w\W]*?)" pb-url'
     second_page_pattern = r'<h2>[\w\W]*?</h2>'
+    filename_pattern = r'title="([\W\w]*?)" target'
 
     def __input_video(self):
         wd = input('请输入视频名字：')
@@ -47,13 +48,12 @@ class Spider():
 
     def __analysisyouku(self, html):
         # 针对优酷的分析爬取
-        roothtml = re.findall(Spider.second_page_pattern,html)
-        root2html = re.findall(r'<h2>[\w\W]*?</h2>',str(roothtml))
+        root2html = re.findall(self.second_page_pattern,str(html))
         # reses = re.findall(r'href="//([\w\W]*?)" title',str(roothtml))
         name_urls = []
         for r in root2html:
             sec_url = re.findall(r'href="//([\w\W]*?)" title',r)[0]
-            ahead_name = re.findall(r'title="([\w\W]*?)" target',r)[0]
+            ahead_name = re.findall(self.filename_pattern,r)[0]
             name_url = {ahead_name:sec_url}
             name_urls.append(name_url)
         video_num_pattern = r'target="_blank">(\w*?)</a>'
@@ -69,7 +69,7 @@ class Spider():
             nums = re.findall(video_num_pattern,all_content)
             urls = re.findall(video_url_pattern,all_content)
             for num in nums:
-                video_url = ahead_name+'第'+num+'集:'+self.vip_url+'https://'+urls[int(num)-1]
+                video_url = ahead_name+'第'+num+'集--'+'<a href="'+self.vip_url+'https://'+urls[int(num)-1]+'" target="_blank"></a>'
                 video_urls.append(video_url)
         return video_urls
     def __analysis(self, html):
@@ -110,20 +110,19 @@ class Spider():
             print(lis['name'] + '\t' + lis['url'])
 
     def __save_video_lists(self, lists):
-        if isinstance(lists[0], list):
-            name = lists[0]['name']
+        if isinstance(lists[0], dict):
+            name = list[0]['name']
         else:
-            name = lists[0].split(":")[0]
+            name = lists[0].split("--")[0]
         with open('./{name}.md'.format(name=name), 'w', encoding='utf-8') as f:
             for l in lists:
-                f.writelines(str(l)+'\n')
+                f.writelines(str(l)+'  ')
             f.close()
 
     def go(self):
         url = self.__input_video()
         html = self.__get_content(url)
         if 'youku' not in html:
-            html = self.__analysis(html)
             html = self.__analysis(html)
             video_lists = self.__refine(html)
             self.__my_print(video_lists)
